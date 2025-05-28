@@ -1,0 +1,145 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=From : {{ $json.From }}\n\nSubject : {{ $json.Subject }}\n\nMessage : {{ $json.snippet }}\n\n",
+        "options": {
+          "systemMessage": "Use the email data and reply the user.\n- If the product is iphone then reply with acceptance that we want to buy it.\n- otherwise deny the offer in a polite way.\n- You only need to output the email body in plain text."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        280,
+        580
+      ],
+      "id": "a24e241e-9ae6-418e-85b3-c7d9fccef2b1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger1').item.json.From }}",
+        "subject": "={{ $('Gmail Trigger1').item.json.Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}\n\nBest Regards,\nImaan Aftab\nFrom Rawalpindi",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        580
+      ],
+      "id": "c4d7107e-c39e-420d-b598-c1dfb130b5ca",
+      "name": "Gmail",
+      "webhookId": "d27c9c72-2661-4fb4-a14b-775332af27ce",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "St49xst9EtHcWl8b",
+          "name": "Gmail account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "includeSpamTrash": false,
+          "labelIds": [
+            "INBOX"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        580
+      ],
+      "id": "0f331cd9-a95f-4a99-9b6a-2d3f2d23ed39",
+      "name": "Gmail Trigger1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "St49xst9EtHcWl8b",
+          "name": "Gmail account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        220,
+        820
+      ],
+      "id": "11b6e58d-ea1f-40d2-b655-3ffc17a24dcf",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "IV8rBZAZ5b3yWWU8",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "917d289e-2893-40be-b605-f323fabb01fb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f45e2a99226774c4ece917cbb24ea52344c21f3d556e1e4f12308d728145736e"
+  },
+  "id": "y3s2Lx1a7A92yvXm",
+  "tags": []
+}
